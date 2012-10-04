@@ -1,0 +1,7 @@
+*.app/*
+.DS_Store
+*/*.app/*
+starbursts/*
+*/starbursts/*
+application.macosx/*
+StarburstGen/*
