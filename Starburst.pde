@@ -1,4 +1,5 @@
 import java.util.concurrent.*;
+import java.util.*;
 final javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
 int negvar = 15;
 int posvar = 15;
@@ -8,9 +9,16 @@ int h;
 
 int doneCount=0;
 
-static double BWBIAS = 0; //0 is no bias.  
+static double RBIAS = -.5; //0 is no bias.  
 // higher numbers for lighter, lower numbers for darker
-static int CENTERBIAS = 30; //0 is no bias, higher means more towards center
+static double GBIAS = .5; //0 is no bias.  
+// higher numbers for lighter, lower numbers for darker
+static double BBIAS = 0; //0 is no bias.  
+// higher numbers for lighter, lower numbers for darker
+static double BWBIAS = (RBIAS+GBIAS+BBIAS)/3;//0 is no bias.  
+// higher numbers for lighter, lower numbers for darker
+
+static int CENTERBIAS = 1; //1 is no bias, higher means more towards center
 // bigger numbers also take longer to make an image, but mean more toned down
 
 static int GREYFACTOR = 0;//0 is no bias.  
@@ -27,7 +35,7 @@ static int THREADNUM = 15;
 
 static final String PARAM_CHANGE_MESSAGE = 
      "Please input the initial selection value in the form" + "\n"
-     + "(b/w bias, center bias, grey factor,random layout factor)";
+     + "(red bias, green bias, blue bias, center bias, grey factor,random layout factor)";
 int pixnum=0;
 boolean current[][];
 List<Pair> opperations;
@@ -77,10 +85,12 @@ void setParams(){
   if(input.charAt(0)=='(') input = input.substring(1,input.length()-1);
   String[] params = input.split(",");
   try{
-    BWBIAS = Double.parseDouble(params[0]);
-    CENTERBIAS = Integer.parseInt(params[1])+1;
-    GREYFACTOR = Integer.parseInt(params[2]);
-    RANDOMFACTOR = Float.parseFloat(params[3]);
+    RBIAS = Double.parseDouble(params[0]);
+    GBIAS = Double.parseDouble(params[1]);
+    BBIAS = Double.parseDouble(params[2]);
+    CENTERBIAS = Integer.parseInt(params[4])+1;
+    GREYFACTOR = Integer.parseInt(params[5]);
+    RANDOMFACTOR = Float.parseFloat(params[6]);
   }catch(Exception e){
     println(e+" in setParams()");
   }
@@ -307,9 +317,9 @@ void fillPixel(int x, int y) {
     minb=maxb;
   }
 
-  int r=bound(biasedRandom(minr, maxr, CENTERBIAS, BWBIAS),GREYFACTOR,255-GREYFACTOR);
-  int g=bound(biasedRandom(ming, maxg, CENTERBIAS, BWBIAS),GREYFACTOR,255-GREYFACTOR);
-  int b=bound(biasedRandom(minb, maxb, CENTERBIAS, BWBIAS),GREYFACTOR,255-GREYFACTOR);
+  int r=bound(biasedRandom(minr, maxr, CENTERBIAS, RBIAS),GREYFACTOR,255-GREYFACTOR);
+  int g=bound(biasedRandom(ming, maxg, CENTERBIAS, GBIAS),GREYFACTOR,255-GREYFACTOR);
+  int b=bound(biasedRandom(minb, maxb, CENTERBIAS, BBIAS),GREYFACTOR,255-GREYFACTOR);
   setPixel(x, y, color(r, g, b));
   current[x][y]=true;
 }
